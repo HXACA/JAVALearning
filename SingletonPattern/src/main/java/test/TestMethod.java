@@ -1,11 +1,10 @@
 package main.java.test;
 
-import main.java.Singleton1;
-import main.java.Singleton2;
-import main.java.Singleton3;
+import main.java.*;
 import main.java.utils.SerializeUtil;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 /**
@@ -99,6 +98,60 @@ public class TestMethod {
         //true
 
         Singleton3.INSTANCE.doSomething();
+    }
+
+    @Test
+    public void test4() throws Exception {
+//        Singleton4 singleton1 = Singleton4.getInstance();
+//        Singleton4 singleton2 = Singleton4.getInstance();
+//        System.out.println(singleton1==singleton2);
+
+        for(int i=0;i<20;i++){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println(Singleton4.getInstance());
+                }
+            }).start();
+        }
+        //非线程安全，可以加 synchronized 但效率低，使用双检锁优化，添加volatile避免指令重排
+
+        System.in.read();//阻塞主线程
+    }
+
+    @Test
+    public void test5() throws Exception{
+//        Singleton5 singleton1 = Singleton5.getInstance();
+//        Singleton5 singleton2 = Singleton5.getInstance();
+//        System.out.println(singleton1==singleton2);
+
+        for(int i=0;i<20;i++){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Singleton5 singleton1 = Singleton5.getInstance();
+                    Singleton5 singleton2 = Singleton5.getInstance();
+                    System.out.println(Thread.currentThread().getName() +" "+ (singleton1 == singleton2) +" "+ singleton1);
+                }
+            }).start();
+        }
+        //同线程内单例，非同线程不同对象
+        System.in.read();//阻塞主线程
+    }
+
+    @Test
+    public void test6() throws Exception{
+        for(int i=0;i<20;i++){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Singleton6 singleton1 = Singleton6.getInstance();
+                    Singleton6 singleton2 = Singleton6.getInstance();
+                    System.out.println(Thread.currentThread().getName() +" "+ (singleton1 == singleton2) +" "+ singleton1);
+                }
+            }).start();
+        }
+        System.in.read();//阻塞主线程
     }
 
 }
