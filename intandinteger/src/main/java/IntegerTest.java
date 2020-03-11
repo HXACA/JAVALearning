@@ -16,5 +16,6 @@ public class IntegerTest {
         System.out.println(a==b);//不在缓存范围后，是不同的对象
         System.out.println(a.equals(b));//比较值
         System.out.println(a.intValue() == b.intValue());//拆箱后比较
+
     }
 }
