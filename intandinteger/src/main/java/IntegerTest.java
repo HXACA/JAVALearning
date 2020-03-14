@@ -4,6 +4,7 @@
  * @date 2020/3/8 20:39
  */
 public class IntegerTest {
+
     public static void main(String[] args) {
         Integer a = -128;
         Integer b = -128;
@@ -18,4 +19,6 @@ public class IntegerTest {
         System.out.println(a.intValue() == b.intValue());//拆箱后比较
 
     }
+
+
 }
