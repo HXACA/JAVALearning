@@ -8,6 +8,11 @@
 5. ThreadLocal：在各个线程内式单例的，不同线程不保证单例
 6. CAS：无锁乐观策略，线程安全
 
+## super和 this
+1. 都只能在构造器的第一行，且不能同时使用。
+2. this调用的是重载的构造器，super调用的是父类被子类重写的方法。
+3. this和super都指的是对象，所以不能在static环境中使用。
+
 ## 异常
 1. Exception和Error的区别：
     1. 都继承自Throwable
@@ -38,7 +43,17 @@
 ## String,StringBuffer,StringBuilder
 1. String是final的，所以具有不可变性，对于字符串操作会产生新的String对象。
 2. StringBuffer本质是一个线程安全的可修改的字符串序列，由于加入线程安全，会带来额外性能损耗。
-3.StringBuilder是没有线程安全的StringBuffer。
+3. StringBuilder是没有线程安全的StringBuffer。
+4. String重写了equals方法,所以可以使用equals判断两个字符串内容是否一致。equals方法先判断是否为字符串，然后逐个比较。
+5. 
+
+## 方法重写和覆盖
+1. 重写指子类中重写父类的方法，实现的功能不同。要求必须满足两同两小一大。
+    1. 访问修饰符要大于等于父类。
+    2. 方法名和参数相同。
+    3. 引用数据类型要小于等于父类，基本数据类型的返回值必须相同。
+    4. 抛出的异常更小。
+2. 重载指方法名相同，参数类型和类型不同。
 
 ## HashMap,HashTable
 1. HashMap允许null的value或者key，但是HashTable不允许。
@@ -53,28 +68,15 @@
 ## & 和 &&
 1. &&具有短路功能，&当左右不是boolean数据时为位运算符，表示按位与运算。
 
-## 多线程的四种方式
-1. 继承Thread，重写Run方法
-2. 实现Runnable接口，重写call方法，可以用于处理同一资源以及多继承。
-3. 实现Callable接口，重写call方法，可以拿到返回值，允许抛出异常。
-4. 使用线程池，减少创建现成的时间，降低资源消耗，控制并发线程的数量，可以有返回值。
-
-## synchronized 和 ReentrantLock
-1. synchronized可以用来同步方法或代码块：
-    1. 同步方法：给方法增加synchronized关键字，可以使静态方法，也可以是非静态方法，但不能是抽象方法。
-    2. 同步代码块，通过锁定一个指定的对象，来对同步代码进行同步。
-    3. 同步是高开销操作，减少使用同步方法，同步关键代码即可。
-2. ReentrantLock：可重入锁，代码通过lock()方法获取锁，调用unlock释放锁。
-
 ## JVM
 1. JVM结构
     1. https://blog.csdn.net/ocean_fan/article/details/79298076
 2. 类加载器
     1. 加载.class文件，并创建对应的class文件。
     2. 四种类加载器：根加载器，扩展类加载器，系统类加载器，还有用户自定义加载器。
-    3. 双亲委派：从根加载器开始，逐层向下找，也就是优先使用高层的类加载器，保证安全。
-3. Native Method Stack
-    1. Native是一个关键字，代表本地方法，用来与非JAVA程序交互。
+    3. 双亲委派：从根加载器开始，逐层向下找，也就是优先使用高层的，父类的类加载器，减少重复加载，保证安全。比如自己写的String类不会被加载，保证源码安全。
+3. 本地方法栈
+    1. Native是一个关键字，代表本地方法，用来与非JAVA程序交互。比如Thread的启动底层就是本地方法。
     2. 有声明，无实现，标记Native的方法信息保存在 Native Method Stack。
     3. 各个线程不共享。
 4. PC寄存器
@@ -180,6 +182,41 @@
     2. 可见性。由于工作内存和主内存分开，所以某个线程修改完某个变量后，在其他线程中，未必能观察到变量的修改。volatile修饰的变量具备对其他线程的可见通知性，因为他会立即更新到主内存，synchronized和final也能实现可见性。
     3. 原子性。操作不可分割，同时成功或同时失败。被synchronized关键字或其他锁包括起来的操作也可以认为是原子的。
     4. 有序性。java会对一些指令进行指令重排，volatile和synchronized可以保证程序的有序性，保证了指令不进行重排。
+
+## Lambda表达式
+1. 接口中只有一个方法声明时，可以使用Lambda表达式。
+2. 接口中可以有方法的实现，default修饰或者是静态方法。
+3. 接口中可以有方法的实现，所以如果是实现的方法不影响Lambda使用。
+
+## JUC
+1. 什么是JUC
+    1. java.util.concurrent的缩写，java在并发编程中使用的工具类。
+    2. 主要有三个部分java.util.concurrent，java.util.concurrent.atomic,java.util.concurrent.locks。
+2. wait和sleep的区别
+    1. wait会释放锁，sleep不会释放锁。
+3. 线程的六种状态
+    1. new 新创建的线程，还没调用start
+    2. RUNNABLE 就绪和运行都属于RUNNABLE,调用start后就进入就绪状态
+    3. BLOCKED 线程阻塞与锁
+    4. WAITING 等待其他线程，比如通知或中断
+    5. TIMED_WAITING 指定时间后悔自行返回
+    6. TERMINATED 执行完毕
+4. 多线程的四种方式
+    1. 继承Thread，重写Run方法
+    2. 实现Runnable接口，重写call方法，可以用于处理同一资源以及多继承。
+    3. 实现Callable接口，重写call方法，可以拿到返回值，允许抛出异常。
+    4. 使用线程池，减少创建现成的时间，降低资源消耗，控制并发线程的数量，可以有返回值。
+5. synchronized 和 ReentrantLock
+    1. synchronized可以用来同步方法或代码块：
+        1. 同步方法：给方法增加synchronized关键字，可以使静态方法，也可以是非静态方法，但不能是抽象方法。
+        2. 同步代码块，通过锁定一个指定的对象，来对同步代码进行同步。
+        3. 同步是高开销操作，减少使用同步方法，同步关键代码即可。
+    2. ReentrantLock：可重入锁，代码通过lock()方法获取锁，调用unlock释放锁。
+    3. JDK5前synchronized的性能较低，JDK6后性能基本一致。
+    4. 
+6. 多线程中为防止虚假唤醒，避免使用if，使用while。
+7. notify只会唤醒一个等待线程，notifyAll会唤醒所有的等待线程，notify使用不当会导致死锁，所以更推荐使用notifyAll。
+8. 
        
     
     
