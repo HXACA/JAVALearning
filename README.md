@@ -8,6 +8,21 @@
 5. ThreadLocal：在各个线程内式单例的，不同线程不保证单例
 6. CAS：无锁乐观策略，线程安全
 
+## 基础
+1. 抽象类可以有构造方法，但是不能被实例化。不一定只有抽象方法，相反有抽象方法的一定是抽象类。
+2. 外部类不能是静态的，因为如果是静态的，那么随着应用启动该类就会被加载，如果根本没有用过该类，那么就会造成内存浪费，这样是不合理的。
+3. Try-Catch-Finally中，如果在finally修改返回值不会生效，但是如果直接return会覆盖try中的return。
+4. 类初始化的过程
+    1. 创建实例前需要先加载并初始化该类
+    2. 子类初始化前需要初始化父类
+    3. 类初始化执行静态类变量显示赋值代码和静态代码块，从上到下执行。
+5. 实例化的初始化过程
+    1. 非静态实例变量显示赋值代码和非静态代码块从上到下执行，对应的构造器方法最后执行。
+    2. 被重写的非静态方法的this指的是正在创建的对象，所以执行子类的重写方法。
+6. 方法的传参机制和特殊类的不变性
+    1. 基本数据类型传递的是数据值，引用数据类型传递的是地址值。
+    2. String,包装类不可变，所以在方法中指向了新的对象，所以原数据仍然无法修改。
+
 ## super和 this
 1. 都只能在构造器的第一行，且不能同时使用。
 2. this调用的是重载的构造器，super调用的是父类被子类重写的方法。
@@ -51,19 +66,25 @@
 1. 重写指子类中重写父类的方法，实现的功能不同。要求必须满足两同两小一大。
     1. 访问修饰符要大于等于父类。
     2. 方法名和参数相同。
-    3. 引用数据类型要小于等于父类，基本数据类型的返回值必须相同。
+    3. 返回值是引用数据类型要小于等于父类，基本数据类型的返回值必须相同。
     4. 抛出的异常更小。
 2. 重载指方法名相同，参数类型和类型不同。
+3. final方法，静态方法，private等子类不可见方法不可被重写。
 
 ## HashMap,HashTable
 1. HashMap允许null的value或者key，但是HashTable不允许。
+2. HashMap的默认大小为16，扩容因子为0.75。
 2. HashMap在JDK1.7前和HashTable基本相同，但HashTable是线程安全的。
 3. HashMap在JDK1.8时引入了红黑树。
 4. JDK1.7中，HashMap为哈希表+链表，put为头插法，多线程时可能出现死循环。
 5. JDK1.8中，HashMap引入了红黑树。当链表长度达到8，并且数组大小不小于64，就会将链表转为红黑树，如果是小于6就转回链表。多线程时可能出现数据被覆盖。
+6. HashSet的底层是HashMap。相当于是一个只有key的HashMap,value是一个假的Object。
 
 ## ArrayList 和 LinkList
 1. ArrayList是自扩容的动态数组实现，LinkList是双向链表实现。所以性能上随机访问Array比较好，指定位置删除添加Link好。
+2. ArrayList线程不安全，多线程插入数据时会出问题。可以使用Collections.synchronizedList,CopyOnWriteArrayList解决。
+3. Collections.synchronizedList写的效率高，CopyOnWriteArrayList有一个复制操作所以效率低。
+4. CopyOnWriteArrayList的容器可以实现在读取的时候其他线程修改数据，因为他把要读取的和写的容器分开，实现了读写分离，不须加锁，所以读的效率更高。
 
 ## & 和 &&
 1. &&具有短路功能，&当左右不是boolean数据时为位运算符，表示按位与运算。
@@ -203,9 +224,9 @@
     6. TERMINATED 执行完毕
 4. 多线程的四种方式
     1. 继承Thread，重写Run方法
-    2. 实现Runnable接口，重写call方法，可以用于处理同一资源以及多继承。
-    3. 实现Callable接口，重写call方法，可以拿到返回值，允许抛出异常。
-    4. 使用线程池，减少创建现成的时间，降低资源消耗，控制并发线程的数量，可以有返回值。
+    2. 实现Runnable接口，重写run方法，可以用于处理同一资源以及多继承。
+    3. 实现Callable接口，重写call方法，可以拿到返回值，允许抛出异常。配合FutureTask使用，拿到返回值的get方法是阻塞的。
+    4. 使用线程池，减少创建线程的时间，降低资源消耗，控制并发线程的数量，可以有返回值。
 5. synchronized 和 ReentrantLock
     1. synchronized可以用来同步方法或代码块：
         1. 同步方法：给方法增加synchronized关键字，可以使静态方法，也可以是非静态方法，但不能是抽象方法。
@@ -213,10 +234,73 @@
         3. 同步是高开销操作，减少使用同步方法，同步关键代码即可。
     2. ReentrantLock：可重入锁，代码通过lock()方法获取锁，调用unlock释放锁。
     3. JDK5前synchronized的性能较低，JDK6后性能基本一致。
-    4. 
+    4. ReentrantLock可以配合多个condition实现指定唤醒。
+    5. 类中有多个synchronized方法，synchronized锁的是当前的实例对象this，所以同一时刻只能有一个线程能调用其中一个synchronized方法。
+    6. 当锁上的是静态方法，锁的是当前Class对象，所以即使是多个实例，也只能有一个调用静态方法。
+    7. 普通方法上锁和静态方法上锁，两者不会互相影响，因为锁的对象不一样，一个是当前模板一个是对象示例，
 6. 多线程中为防止虚假唤醒，避免使用if，使用while。
 7. notify只会唤醒一个等待线程，notifyAll会唤醒所有的等待线程，notify使用不当会导致死锁，所以更推荐使用notifyAll。
-8. 
-       
+8. CountDownLatch,当一个或多个线程调用await时，线程会阻塞，当其他线程调用countDown时，计数器会减一，值为0时，被await阻塞的线程会被唤醒。
+9. CyclicBarrier,和CountDLatch相对，做加法，达到输入值后会执行定义好的方法。
+10. Semaphore,信号量主要定义了两种操作，acquire和release。调用acquire时，如果信号量能成功获取到则继续执行，否则就等待。release则会将信号量加1，然后唤醒等待的线程。       
+11. ReadWriteLock,读-读操作是可以共存的，读-写，写-写是不可以共存的，会破坏读写一致性，ReadWriteLock解决该问题。
+12. 线程池
+    1. Executors.newFixedThreadPool()  固定线程数的线程池
+    2. Executors.newSingleThreadExecutor() 只有一个线程的线程池
+    3. Executors.newCachedThreadPool() 动态调整的线程池
+    4. 三种方法底层调用的都是ThreadPoolExecutor，他的实现是阻塞队列。
+    5. 七大参数
+        1. corePoolSize:常驻核心线程数，
+        2. maximumPoolSize：线程池中的最大线程数
+        3. keepAliveTime：空闲线程存活时间，超过这个存活时间，多余线程会被销毁。
+        4. unit：时间单位
+        5. BlockingQueue<Runnable> workQueue：阻塞队列，被提交但还没有被执行的任务
+        6. ThreadFactory threadFactory：线程池中工作线程的线程工厂
+        7. RejectedExecutionHandler handler：拒绝策略，当超过最大线程数时如何拒绝新的请求，最大数为maximumPoolSize+队列大小。
+    6. 四种拒绝模式
+        1. AbortPolicy:直接抛出异常组织系统正常运行。
+        2. CallerRunsPolicy:不会抛出异常也不会抛弃任务。将任务回退到调用者。
+        3. DiscardPolicy：直接丢弃无法处理的任务
+        4. DiscardOldestPolicy:抛弃等待最久的任务，就是最先入队列的那几个任务。
+    7. 实际使用中都不使用，而是自己通过ThreadPoolExecutor自定义。
     
+## Redis
+1. Redis索引从0开始，默认有16个库，Select命令切换。
+2. 五大数据类型
+    1. String，Redis的最基本类型，可以包含仍和数据，比如图片和序列化对象，一个字符串value最多可以是512M。
+    2. List，简单的字符串列表，底层是一个链表。
+    3. Set，无序的string集合，是通过HashTable实现的。
+    4. Hash,一个string类型的field和value映射表。
+    5. Zset，有序的string集合，每个元素关联到一个double类型的分数。成员是唯一的，分数是可以重复的。
+3. Key的基础知识
+    1. keys * 显示当前库下的所有key
+    2. move key db 移动某个key到指定库
+    3. expire key 秒钟 设定某key过期时间
+    4. ttl key -1表示永不过期 -2表示已过期
+    5. type key 查看key是什么类型
+    6. exists key,判断某个key是否存在，存在为1，没有为0
+    6. 对于已有值的key，重复赋值会覆盖。
+4. String的基础知识
+    1. set/get/del/append/strlen 看名知用途
+    2. INCR/DECR 自增1/自减1 INCRBY/DECRBY 指定大小的加减，只能用于数字
+    3. get/setrange 获得/设置指定区间的数据 
+    4. setex set的同时设置存活时间
+    5. setnx key不存在才set
+    6. mset/mget/msetnx m代表more 多值赋值，msetnx必须要全部都不存在才能正常插入
+    7. getset 先get再set
+5. List的基础知识
+    1. lpush/rpush/lrange lpush和rpush区别就是lpush往左边插，可以看做是头插法，rpush是尾插法。
+    2. lpop/rpop/lindex/llen 看名知用途
+    3. lrem key n value 删除n个指定value,如果value数少于n则有多少删多少
+    4. ltrim key 截取后再赋值给key
+    5. rpoplpush 源列表 目的列表 源列表rpop后lpush到目的列表
+    6. lset key index value 根据下标设置值
+    7. linsert key before/after v1 v2 多个v1只会插在第一个前后
+    8. 底层是链表，头尾插入效率高，对中间元素操作效率较差，因为查询是O(n)的。
+6. Set的基础知识
+    1. sadd/smembers/sismember 添加/查询/检查
+    2. scard 获取集合里的元素个数
+    3. srem key value 删除某个元素
+    4. srandmember key 随机出几个数
+    5. spop 随机出栈
     
