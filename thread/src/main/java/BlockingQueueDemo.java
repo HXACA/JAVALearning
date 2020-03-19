@@ -6,6 +6,8 @@ import java.util.concurrent.BlockingQueue;
  * @version 1.0
  * @date 2020/3/17 13:59
  */
+
+
 public class BlockingQueueDemo {
     public static void main(String[] args) {
         BlockingQueue<String>blockingQueue = new ArrayBlockingQueue<>(3);
