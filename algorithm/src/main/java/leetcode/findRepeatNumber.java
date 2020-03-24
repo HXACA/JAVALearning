@@ -10,18 +10,8 @@ import java.util.*;
  */
 public class findRepeatNumber {
 
-    class P{
-        int x;
-        int y;
-
-        public P(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
     public static void main(String[] args) {
-        List<P>q = new LinkedList<>();
-        System.out.println();
+        String a = "123";
+        a.length();
     }
 }
