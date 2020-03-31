@@ -9,9 +9,8 @@ import staticproxy.TeachDaoProxy;
  */
 public class MainClass {
     public static void main(String[] args) {
-       ProxyFactory factory = new ProxyFactory(new TeachDao());
-       ITeachDao teachDao = (ITeachDao) factory.getTarget();
-       teachDao.teach();
-        System.out.println(teachDao.who("liuxin"));
+       PersonProxy personProxy = new PersonProxy(new Girl());
+       Person person = (Person) personProxy.getObject();
+        System.out.println(person.dating(1.8));
     }
 }

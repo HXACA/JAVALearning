@@ -21,6 +21,10 @@ public class TeachDao implements ITeachDao {
     }
 
     public static void main(String[] args){
-       int[] nums = new int[10];
+      int a = 1;
+      int b = 2;
+      double ans = 0;
+      double c = (b-a)/2.0;
+        System.out.println(c);
     }
 }
