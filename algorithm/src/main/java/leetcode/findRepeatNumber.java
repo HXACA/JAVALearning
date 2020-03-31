@@ -1,6 +1,5 @@
 package leetcode;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -54,22 +53,18 @@ public class findRepeatNumber {
     }
 
     public static void main(String[] args) {
-        int[] a = {4,2,5,1,3};
-        Node root = new Node(4);
-        root.left = new Node(2);
-        root.right = new Node(5);
-        Node node = solve(root);
-        Node temp = node;
-        while(temp !=null && temp.right!=null){
-            temp = temp.right;
-        }
-        temp.right = node;
-        node.left = temp;
-        int index = 0;
-        while(node.right!=null && index<10){
-            System.out.println(node.val);
-            node = node.right;
-            index++;
-        }
+
+        System.out.println(Integer.MAX_VALUE);
     }
+}
+
+//实现Comparator接口
+class MyComparator implements Comparator<Integer>{
+    @Override
+    public int compare(Integer o1, Integer o2) {
+    		        /*如果o1小于o2，我们就返回正值，如果o1大于o2我们就返回负值，
+    		         这样颠倒一下，就可以实现降序排序了,反之即可自定义升序排序了*/
+        return o2-o1;
+    }
+
 }
