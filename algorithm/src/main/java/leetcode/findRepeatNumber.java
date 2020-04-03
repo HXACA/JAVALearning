@@ -28,6 +28,7 @@ class Node {
 
 public class findRepeatNumber {
 
+    private volatile int a;
 
     public static Node solve(Node root){
         if(root==null) {
@@ -53,7 +54,6 @@ public class findRepeatNumber {
     }
 
     public static void main(String[] args) {
-
         System.out.println(Integer.MAX_VALUE);
     }
 }
